@@ -1,48 +1,56 @@
 import { useState, useEffect, useCallback } from 'react'
-import { reservesDataWithBalanceToUI, userReservesDataWithBalanceToUI } from '../utilities/helpers'
+import { getChainById, reservesDataWithBalanceToUI, userReservesDataWithBalanceToUI } from '../utilities/helpers'
 import { ReserveDataWithBalance, UserReserveDataWithBalance } from '../utilities/types'
-import ReservesList from './ReservesList'
-import UserReservesList from './UserReservesList'
 import { fetchReservesSummary, fetchUserBalances } from '../utilities/api'
-import { CHAINS, MOCK_ETH_ADDRESS } from '../utilities/constants'
+import { PROVIDERS_DATA, MOCK_ETH_ADDRESS } from '../utilities/constants'
+import ReservesList from './Reserves/ReservesList'
+import UserReservesList from './Reserves/UserReservesList'
 
 interface DashboardProps {
+  chainId: number
   account: string
 }
 
 type Component = (props: DashboardProps) => JSX.Element
 
 const Dashboard: Component = (props) => {
-  const { account } = props
+  const { account, chainId } = props
 
   const [isLoading, setIsLoading] = useState(false)
   const [reservesUpToDate, setReservesUpToDate] = useState(false)
   const [error, setError] = useState('')
   const [reservesData, setReservesData] = useState<{
+    chainId: number
+    accountAddress: string
     reservesWithBalances: ReserveDataWithBalance[]
     userReservesWithBalances: UserReserveDataWithBalance[]
   }>()
 
   const fetchData = async () => {
-    const defaultChain = CHAINS.GOERLI
-    const reservesSummary = await fetchReservesSummary(defaultChain.address, account)
-    const balances = await fetchUserBalances(defaultChain.address, account)
+    const defaultChain = getChainById(chainId) || PROVIDERS_DATA.GOERLI
+    const reservesSummary = await fetchReservesSummary(chainId, account)
+    const balances = await fetchUserBalances(chainId, account)
 
     const reservesWithBalances = reservesDataWithBalanceToUI(
       reservesSummary.reserves,
       balances,
-      CHAINS.GOERLI,
+      PROVIDERS_DATA.GOERLI,
       MOCK_ETH_ADDRESS
     )
 
     const userReservesWithBalances = userReservesDataWithBalanceToUI(
       reservesSummary.userReserves.reserves,
       balances,
-      CHAINS.GOERLI,
+      PROVIDERS_DATA.GOERLI,
       MOCK_ETH_ADDRESS
     )
 
-    return { reservesWithBalances: reservesWithBalances, userReservesWithBalances: userReservesWithBalances }
+    return {
+      chainId: defaultChain.chainId,
+      accountAddress: account,
+      reservesWithBalances: reservesWithBalances,
+      userReservesWithBalances: userReservesWithBalances,
+    }
   }
 
   const handleReservesUpdated = useCallback(() => {
@@ -55,7 +63,6 @@ const Dashboard: Component = (props) => {
       return
     }
 
-    console.log('useEffect')
     setError('')
 
     setIsLoading(true)
@@ -73,14 +80,19 @@ const Dashboard: Component = (props) => {
   }, [reservesUpToDate])
 
   return (
-    <div className="dashboard">
+    <div className="dashboard mt-4">
       {isLoading && <p className="text-center">Loading...</p>}
       {error && <p className="text-center">{error}</p>}
       {!isLoading && !error && reservesData && (
         <div className="container">
           <div className="row">
             <div className="col">
-              <ReservesList reserves={reservesData.reservesWithBalances} onDeposit={handleReservesUpdated} />
+              <ReservesList
+                account={reservesData.accountAddress}
+                chainId={reservesData.chainId}
+                reserves={reservesData.reservesWithBalances}
+                onDeposit={handleReservesUpdated}
+              />
             </div>
             <div className="col">
               <UserReservesList userReserves={reservesData.userReservesWithBalances} />

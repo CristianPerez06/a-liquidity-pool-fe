@@ -1,27 +1,27 @@
-import { CHAINS } from './constants'
+import { PROVIDERS_DATA } from './constants'
 import { ChainData } from './types'
 
 export const chainsToList = (): ChainData[] => {
-  const chains = Object.entries(CHAINS).map((chain) => {
+  const chains = Object.entries(PROVIDERS_DATA).map((chain) => {
     return {
       name: chain[0],
       chainId: chain[1].chainId,
       baseAssetSymbol: chain[1].baseAssetSymbol,
-      address: chain[1].address,
       wrappedBaseAssetSymbol: chain[1].wrappedBaseAssetSymbol,
+      lendingPoolProviderAddress: chain[1].lendingPoolProviderAddress,
     }
   })
   return chains
 }
 
-export const chainsToOptionsList = () => {
-  const chains = Object.entries(CHAINS).map((chain) => {
-    return {
-      value: chain[0],
-      label: chain[1].name,
-    }
-  })
-  return chains
+export const getProviderDataByChainId = (id: number) => {
+  const data = Object.entries(PROVIDERS_DATA).find((x) => x[1].chainId === id)
+  return data?.[1]
+}
+
+export const getChainById = (id: number) => {
+  const chain = chainsToList().find((x) => x.chainId === id)
+  return chain
 }
 
 export const processReserveData = (data: any) => {
@@ -139,14 +139,25 @@ export const getChainIdHumanized = (chaindId: string) => {
   return Number(Number(chaindId).toString(10))
 }
 
-export const chainIdIsSupported = (chaindId: number) => {
-  const chain = chainsToList().find((chain) => chain.chainId === chaindId)
-  return !!chain
-}
-
 export const formatBalanceNumber = (num: number) => {
   if (num < 0.01) {
     return '< 0.01'
   }
   return num.toFixed(2).toString()
+}
+
+export const getWalletError = (errorCode: number) => {
+  let errMessage = ''
+  switch (errorCode) {
+    case -32002:
+      errMessage = 'You have pending requests in your wallet.'
+      break
+    case 4001:
+      errMessage = 'You have rejected the request to your wallet.'
+      break
+    default:
+      errMessage = 'Oops... something went wrong.'
+      break
+  }
+  return errMessage
 }
