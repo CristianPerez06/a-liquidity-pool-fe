@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Button, Table } from 'reactstrap'
-import { depositAsset } from '../../utilities/api'
+import { supplyAsset } from '../../utilities/api'
 import { PROVIDERS_DATA } from '../../utilities/constants'
 import { confirmTransaction, signPermit } from '../../utilities/ethereum'
 import { getChainById, getWalletError } from '../../utilities/helpers'
-import { BasicReserveData, DepositData, ReserveDataWithBalance } from '../../utilities/types'
-import DepositModal from './DepositModal'
+import { BasicReserveData, SupplyData, ReserveDataWithBalance } from '../../utilities/types'
+import SupplyModal from './SupplyModal'
 
 interface ComponentState {
   isModalOpen: boolean
@@ -13,20 +13,20 @@ interface ComponentState {
   isTxApproved: boolean
   modalError: string
   modalData?: BasicReserveData
-  depositData?: DepositData | undefined
+  supplyData?: SupplyData | undefined
 }
 
 interface ReservesListProps {
   account: string
   chainId: number
   reserves: ReserveDataWithBalance[]
-  onDeposit?: () => void
+  onSupply?: () => void
 }
 
 type Component = (props: ReservesListProps) => JSX.Element
 
 const ReservesList: Component = (props) => {
-  const { account, chainId, reserves, onDeposit } = props
+  const { account, chainId, reserves, onSupply } = props
 
   const initialState = {
     isModalOpen: false,
@@ -60,8 +60,6 @@ const ReservesList: Component = (props) => {
   }
 
   const handleOnApproval = async (reserveData: BasicReserveData, amount: number) => {
-    // eslint-disable-next-line no-debugger
-    debugger
     setReserveListState((prev: ComponentState) => ({
       ...prev,
       modalError: '',
@@ -71,7 +69,7 @@ const ReservesList: Component = (props) => {
     try {
       // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
       // const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
-      const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
+      const dData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         depositData: { ...dData },
@@ -87,7 +85,7 @@ const ReservesList: Component = (props) => {
     }
   }
 
-  const handleOnDeposit = async () => {
+  const handleOnSupply = async () => {
     setReserveListState((prev: ComponentState) => ({
       ...prev,
       modalError: '',
@@ -95,15 +93,15 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      // await confirmTransaction(reserveListState.depositData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
-      await depositAsset(chainData.chainId, reserveListState.depositData?.asset, reserveListState.depositData)
+      // await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
+      await supplyAsset(chainData.chainId, reserveListState.supplyData?.asset, reserveListState.supplyData)
 
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         isTxApproved: false,
         isModalOpen: false,
       }))
-      onDeposit?.()
+      onSupply?.()
     } catch (err: any) {
       setReserveListState((prev: ComponentState) => ({
         ...prev,
@@ -156,10 +154,10 @@ const ReservesList: Component = (props) => {
       </div>
       {/* Modal */}
       {reserveListState.isModalOpen && reserveListState.modalData && (
-        <DepositModal
+        <SupplyModal
           assetData={reserveListState.modalData}
           onApproval={handleOnApproval}
-          onDeposit={handleOnDeposit}
+          onSupply={handleOnSupply}
           onClose={handleOnModalClose}
           isTxApproved={reserveListState.isTxApproved}
           isLoading={reserveListState.isLoading}

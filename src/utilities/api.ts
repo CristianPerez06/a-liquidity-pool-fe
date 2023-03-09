@@ -1,4 +1,5 @@
 import { processReserveData, processUserReservesData } from './helpers'
+import { DepositData } from './types'
 
 export const fetchReservesSummary = async (chainId: number, userAddress: string) => {
   try {
@@ -35,11 +36,11 @@ export const fetchUserBalances = async (chainId: number, userAddress: string) =>
   }
 }
 
-export const depositAsset = async (chainId: number, reserve: any, depositData: any) => {
+export const supplyAsset = async (chainId: number, reserve: any, depositData: any) => {
   const payload = { chain: chainId, reserve: reserve, data: depositData }
 
   try {
-    const url = new URL('http://localhost:4400/api/deposit-asset')
+    const url = new URL('http://localhost:4400/api/supply-asset')
     const params: any = {
       method: 'POST',
       headers: {
@@ -51,6 +52,19 @@ export const depositAsset = async (chainId: number, reserve: any, depositData: a
 
     const response = await fetch(url, params)
     const data = await response.json()
+
+    return data
+  } catch (error: any) {
+    throw new Error(error.message)
+  }
+}
+
+export const fetchLatestDeposits = async () => {
+  try {
+    const url = new URL('http://localhost:4400/api/latest-deposits')
+
+    const response = await fetch(url)
+    const data: DepositData[] = await response.json()
 
     return data
   } catch (error: any) {

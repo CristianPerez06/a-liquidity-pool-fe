@@ -30,14 +30,19 @@ export interface PermitData {
   deadline: number
 }
 
-// export interface DepositData extends PermitData {
+// export interface SupplyData extends PermitData {
 //   asset: string
 //   amount: number
 //   onBehalfOf: string
 // }
 
-export interface DepositData {
+export interface SupplyData {
   asset: string
   amount: number
   onBehalfOf: string
+}
+
+export interface DepositData {
+  tx: string
+  amount: number
 }

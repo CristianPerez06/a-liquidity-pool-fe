@@ -39,7 +39,7 @@ const UserReservesList: Component = (props) => {
             <tbody>
               <tr>
                 <th colSpan={4}>
-                  <p className="pt-4 pb-0">Make your first deposit</p>
+                  <p className="pt-4 pb-0">Make your first supply</p>
                 </th>
               </tr>
             </tbody>
