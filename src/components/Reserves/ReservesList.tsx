@@ -13,7 +13,7 @@ interface ComponentState {
   isTxApproved: boolean
   modalError: string
   modalData?: BasicReserveData
-  depositData?: DepositData
+  depositData?: DepositData | undefined
 }
 
 interface ReservesListProps {
@@ -53,12 +53,15 @@ const ReservesList: Component = (props) => {
     setReserveListState((prev: ComponentState) => ({
       ...prev,
       modalError: '',
+      isTxApproved: false,
       isLoading: false,
       isModalOpen: false,
     }))
   }
 
   const handleOnApproval = async (reserveData: BasicReserveData, amount: number) => {
+    // eslint-disable-next-line no-debugger
+    debugger
     setReserveListState((prev: ComponentState) => ({
       ...prev,
       modalError: '',
@@ -66,9 +69,9 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
-      const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
-
+      // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
+      // const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         depositData: { ...dData },
@@ -92,7 +95,7 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      await confirmTransaction(reserveListState.depositData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
+      // await confirmTransaction(reserveListState.depositData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
       await depositAsset(chainData.chainId, reserveListState.depositData?.asset, reserveListState.depositData)
 
       setReserveListState((prev: ComponentState) => ({

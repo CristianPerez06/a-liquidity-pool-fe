@@ -21,7 +21,7 @@ const DepositModal: Component = (props) => {
 
   const handleOnApproval = useCallback(() => {
     onApproval?.(assetData, amount)
-  }, [isTxApproved])
+  }, [isTxApproved, amount])
 
   const handleOnDeposit = useCallback(() => {
     onDeposit?.()

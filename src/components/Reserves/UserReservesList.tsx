@@ -22,18 +22,28 @@ const UserReservesList: Component = (props) => {
               <th>APY</th>
             </tr>
           </thead>
-          <tbody>
-            {userReserves.map((userReserve) => {
-              return (
-                <tr key={userReserve.symbol}>
-                  <td>{userReserve.symbol}</td>
-                  <td>{userReserve.balance}</td>
-                  <td>{userReserve.balanceUSD}</td>
-                  <td>{userReserve.supplyAPY}</td>
-                </tr>
-              )
-            })}
-          </tbody>
+          {userReserves.length !== 0 ? (
+            <tbody>
+              {userReserves.map((userReserve) => {
+                return (
+                  <tr key={userReserve.symbol}>
+                    <td>{userReserve.symbol}</td>
+                    <td>{userReserve.balance}</td>
+                    <td>{userReserve.balanceUSD}</td>
+                    <td>{userReserve.supplyAPY}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          ) : (
+            <tbody>
+              <tr>
+                <th colSpan={4}>
+                  <p className="pt-4 pb-0">Make your first deposit</p>
+                </th>
+              </tr>
+            </tbody>
+          )}
         </Table>
       </div>
     </div>
