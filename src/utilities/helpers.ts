@@ -38,24 +38,24 @@ export const processReserveData = (data: any) => {
   })
 }
 
-export const processUserReservesData = (data: any) => {
+export const processAccountReservesData = (data: any) => {
   const { userReservesData, netWorthUSD } = data
 
-  const userReserves = userReservesData.map((userReserve: any) => {
+  const accountReserves = userReservesData.map((accountReserve: any) => {
     return {
-      address: userReserve.underlyingAsset,
-      symbol: userReserve.reserve.symbol,
-      supplyAPY: formatBalanceNumber(Number(userReserve.reserve.supplyAPY * 100)),
-      isIsolated: userReserve.reserve.isIsolated,
-      balance: formatBalanceNumber(Number(userReserve.underlyingBalance)),
-      balanceUSD: formatBalanceNumber(Number(userReserve.underlyingBalanceUSD)),
-      decimals: userReserve.reserve.decimals,
+      address: accountReserve.underlyingAsset,
+      symbol: accountReserve.reserve.symbol,
+      supplyAPY: formatBalanceNumber(Number(accountReserve.reserve.supplyAPY * 100)),
+      isIsolated: accountReserve.reserve.isIsolated,
+      balance: formatBalanceNumber(Number(accountReserve.underlyingBalance)),
+      balanceUSD: formatBalanceNumber(Number(accountReserve.underlyingBalanceUSD)),
+      decimals: accountReserve.reserve.decimals,
     }
   })
 
   return {
     balance: Number(netWorthUSD).toFixed(2),
-    reserves: userReserves,
+    reserves: accountReserves,
   }
 }
 
@@ -104,18 +104,18 @@ export const reservesDataWithBalanceToUI = (
   return reservesWithBalance
 }
 
-export const userReservesDataWithBalanceToUI = (
-  userReserves: any,
+export const accountReservesDataWithBalanceToUI = (
+  accountReserves: any,
   balances: any,
   chainData: ChainData,
   mockedEthAddress: string
 ) => {
-  const userReservesWithBalance = balances.map((balance: any) => {
-    const userReserve = userReserves.find((r: any) => r.address === balance.address)
+  const accountReservesWithBalance = balances.map((balance: any) => {
+    const accountReserve = accountReserves.find((r: any) => r.address === balance.address)
 
     let mergedData
-    if (!userReserve) {
-      const wrappedAssetReserve = userReserves.find((r: any) => r.symbol === chainData.wrappedBaseAssetSymbol)
+    if (!accountReserve) {
+      const wrappedAssetReserve = accountReserves.find((r: any) => r.symbol === chainData.wrappedBaseAssetSymbol)
       mergedData = {
         ...wrappedAssetReserve,
         symbol: chainData.baseAssetSymbol,
@@ -124,15 +124,15 @@ export const userReservesDataWithBalanceToUI = (
       }
     } else {
       mergedData = {
-        ...userReserve,
-        // balance: balanceToUI(balance.balance, userReserve.decimals),
+        ...accountReserve,
+        // balance: balanceToUI(balance.balance, accountReserve.decimals),
       }
     }
 
     return mergedData
   })
 
-  return userReservesWithBalance.filter((x: any) => x.balanceUSD > 0)
+  return accountReservesWithBalance.filter((x: any) => x.balanceUSD > 0)
 }
 
 export const getChainIdHumanized = (chaindId: string) => {

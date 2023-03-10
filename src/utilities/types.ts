@@ -19,7 +19,7 @@ export interface ReserveDataWithBalance extends BasicReserveData {
   isIsolated: boolean
 }
 
-export interface UserReserveDataWithBalance extends BasicReserveData {
+export interface AccountReserveDataWithBalance extends BasicReserveData {
   balanceUSD: string
 }
 

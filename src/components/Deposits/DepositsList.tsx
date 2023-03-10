@@ -11,10 +11,15 @@ const DepositsList: Component = (props) => {
   const { deposits } = props
 
   return (
-    <div className="deposits-list mb-4">
+    <div className="deposits-list mb-4" style={{ maxWidth: 700 + 'px' }}>
       <div className="table-container bg-dark p-4 rounded-4">
-        <Table responsive dark hover className="text-center">
+        <Table responsive dark hover={deposits.length !== 0} className="text-center">
           <thead>
+            <tr>
+              <th colSpan={4} className="fs-2 pb-4">
+                Deposits
+              </th>
+            </tr>
             <tr className="text-center fs-4">
               <th>Action</th>
               <th>Transaction</th>
@@ -27,7 +32,9 @@ const DepositsList: Component = (props) => {
                 return (
                   <tr key={deposit.tx}>
                     <td>Deposit</td>
-                    <td>{deposit.tx}</td>
+                    <td>
+                      <span className="d-inline-block text-break">0x8d6880f757c4e8BAFeD195D4370d98a424245136</span>
+                    </td>
                     <td>{deposit.amount}</td>
                   </tr>
                 )
@@ -36,9 +43,9 @@ const DepositsList: Component = (props) => {
           ) : (
             <tbody>
               <tr>
-                <th colSpan={4}>
+                <td colSpan={4}>
                   <p className="pt-4 pb-0">No deposits available</p>
-                </th>
+                </td>
               </tr>
             </tbody>
           )}

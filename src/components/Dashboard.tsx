@@ -14,7 +14,7 @@ const Dashboard: Component = (props) => {
   return (
     <div className="dashboard mt-4">
       <Reserves chainId={chainId} account={account} />
-      <Deposits />
+      <Deposits chainId={chainId} account={account} />
     </div>
   )
 }

@@ -1,31 +1,31 @@
-import { processReserveData, processUserReservesData } from './helpers'
+import { processReserveData, processAccountReservesData } from './helpers'
 import { DepositData } from './types'
 
-export const fetchReservesSummary = async (chainId: number, userAddress: string) => {
+export const fetchReservesSummary = async (chainId: number, account: string) => {
   try {
     const url = new URL('http://localhost:4400/api/reserves-summary')
-    url.search = `chain=${chainId}&user=${userAddress}`
+    url.search = `chain=${chainId}&account=${account}`
 
     const response = await fetch(url)
     const data = await response.json()
     const { reserves, userReserves } = data
 
     const reservesData = processReserveData(reserves)
-    const userReservesData = processUserReservesData(userReserves)
+    const accountReservesData = processAccountReservesData(userReserves)
 
     return {
       reserves: reservesData,
-      userReserves: userReservesData,
+      accountReserves: accountReservesData,
     }
   } catch (error: any) {
     throw new Error(error.message)
   }
 }
 
-export const fetchUserBalances = async (chainId: number, userAddress: string) => {
+export const fetchAccountBalances = async (chainId: number, account: string) => {
   try {
-    const url = new URL('http://localhost:4400/api/user-balances')
-    url.search = `chain=${chainId}&user=${userAddress}`
+    const url = new URL('http://localhost:4400/api/account-balances')
+    url.search = `chain=${chainId}&account=${account}`
 
     const response = await fetch(url)
     const data = await response.json()
@@ -36,8 +36,8 @@ export const fetchUserBalances = async (chainId: number, userAddress: string) =>
   }
 }
 
-export const supplyAsset = async (chainId: number, reserve: any, depositData: any) => {
-  const payload = { chain: chainId, reserve: reserve, data: depositData }
+export const supplyAsset = async (chainId: number, reserve: any, supplyData: any) => {
+  const payload = { chain: chainId, reserve: reserve, data: supplyData }
 
   try {
     const url = new URL('http://localhost:4400/api/supply-asset')
@@ -59,9 +59,10 @@ export const supplyAsset = async (chainId: number, reserve: any, depositData: an
   }
 }
 
-export const fetchLatestDeposits = async () => {
+export const fetchLatestDeposits = async (chainId: number, account: string) => {
   try {
     const url = new URL('http://localhost:4400/api/latest-deposits')
+    url.search = `chain=${chainId}&account=${account}`
 
     const response = await fetch(url)
     const data: DepositData[] = await response.json()

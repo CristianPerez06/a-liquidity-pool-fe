@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getChainById, reservesDataWithBalanceToUI, userReservesDataWithBalanceToUI } from '../../utilities/helpers'
-import { ReserveDataWithBalance, UserReserveDataWithBalance } from '../../utilities/types'
-import { fetchReservesSummary, fetchUserBalances } from '../../utilities/api'
+import { getChainById, reservesDataWithBalanceToUI, accountReservesDataWithBalanceToUI } from '../../utilities/helpers'
+import { ReserveDataWithBalance, AccountReserveDataWithBalance } from '../../utilities/types'
+import { fetchReservesSummary, fetchAccountBalances } from '../../utilities/api'
 import { PROVIDERS_DATA, MOCK_ETH_ADDRESS } from '../../utilities/constants'
 import ReservesList from '../Reserves/ReservesList'
-import UserReservesList from '../Reserves/UserReservesList'
+import AccountReservesList from '../Reserves/AccountReservesList'
 
 interface ReservesProps {
   chainId: number
@@ -23,13 +23,13 @@ const Reserves: Component = (props) => {
     chainId: number
     accountAddress: string
     reservesWithBalances: ReserveDataWithBalance[]
-    userReservesWithBalances: UserReserveDataWithBalance[]
+    accountReservesWithBalances: AccountReserveDataWithBalance[]
   }>()
 
   const fetchData = async () => {
     const defaultChain = getChainById(chainId) || PROVIDERS_DATA.GOERLI
     const reservesSummary = await fetchReservesSummary(chainId, account)
-    const balances = await fetchUserBalances(chainId, account)
+    const balances = await fetchAccountBalances(chainId, account)
 
     const reservesWithBalances = reservesDataWithBalanceToUI(
       reservesSummary.reserves,
@@ -38,8 +38,8 @@ const Reserves: Component = (props) => {
       MOCK_ETH_ADDRESS
     )
 
-    const userReservesWithBalances = userReservesDataWithBalanceToUI(
-      reservesSummary.userReserves.reserves,
+    const accountReservesWithBalances = accountReservesDataWithBalanceToUI(
+      reservesSummary.accountReserves.reserves,
       balances,
       PROVIDERS_DATA.GOERLI,
       MOCK_ETH_ADDRESS
@@ -49,7 +49,7 @@ const Reserves: Component = (props) => {
       chainId: defaultChain.chainId,
       accountAddress: account,
       reservesWithBalances: reservesWithBalances,
-      userReservesWithBalances: userReservesWithBalances,
+      accountReservesWithBalances: accountReservesWithBalances,
     }
   }
 
@@ -95,7 +95,7 @@ const Reserves: Component = (props) => {
               />
             </div>
             <div className="col">
-              <UserReservesList userReserves={reservesData.userReservesWithBalances} />
+              <AccountReservesList accountReserves={reservesData.accountReservesWithBalances} />
             </div>
           </div>
         </div>

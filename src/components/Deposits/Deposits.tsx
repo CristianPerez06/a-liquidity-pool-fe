@@ -3,27 +3,34 @@ import { fetchLatestDeposits } from '../../utilities/api'
 import { DepositData } from '../../utilities/types'
 import DepositsList from './DepositsList'
 
-type Component = () => JSX.Element
+interface ReservesProps {
+  chainId: number
+  account: string
+}
 
-const Deposits: Component = () => {
+type Component = (props: ReservesProps) => JSX.Element
+
+const Deposits: Component = (props) => {
+  const { chainId, account } = props
+
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [items, setItems] = useState<DepositData[]>([])
 
-  const fetchData = async () => {
-    const res = await fetchLatestDeposits()
+  const fetchData = async (chainId: number, account: string) => {
+    const res = await fetchLatestDeposits(chainId, account)
     return res
   }
 
   useEffect(() => {
-    fetchData()
+    fetchData(chainId, account)
       .then((res) => {
         setItems(res)
       })
       .catch((err) => {
         console.log(err.message)
       })
-  }, [])
+  }, [chainId, account])
 
   return (
     <div className="deposits">
@@ -31,7 +38,7 @@ const Deposits: Component = () => {
       {error && <p className="text-center">{error}</p>}
       {!isLoading && !error && items && (
         <div className="container">
-          <div className="row">
+          <div className="row justify-content-center">
             <DepositsList deposits={items} />
           </div>
         </div>

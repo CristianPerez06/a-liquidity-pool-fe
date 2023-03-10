@@ -34,7 +34,7 @@ const ReservesList: Component = (props) => {
     isTxApproved: false,
     modalError: '',
     modalData: undefined,
-    depositData: undefined,
+    supplyData: undefined,
   }
 
   const [reserveListState, setReserveListState] = useState<ComponentState>(initialState)
@@ -68,11 +68,11 @@ const ReservesList: Component = (props) => {
 
     try {
       // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
-      // const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
-      const dData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
+      // const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
       setReserveListState((prev: ComponentState) => ({
         ...prev,
-        depositData: { ...dData },
+        supplyData: { ...sData },
         isTxApproved: true,
         isLoading: false,
       }))
@@ -117,7 +117,12 @@ const ReservesList: Component = (props) => {
       <div className="table-container bg-dark p-4 rounded-4">
         <Table responsive dark hover className="text-center">
           <thead>
-            <tr className="fs-4">
+            <tr>
+              <th colSpan={4} className="fs-2 pb-4">
+                Assets
+              </th>
+            </tr>
+            <tr className="fs-5">
               <th>Asset</th>
               <th>Wallet Balance</th>
               <th>APY</th>
@@ -143,7 +148,7 @@ const ReservesList: Component = (props) => {
                       }}
                       disabled={!(Number(reserve.balance) > 0)}
                     >
-                      Deposit
+                      Supply
                     </Button>
                   </td>
                 </tr>
