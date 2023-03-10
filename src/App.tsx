@@ -83,7 +83,7 @@ const App: Component = () => {
 
   return (
     <div className="App">
-      <h1 className="text-center my-4">A liquidity pool</h1>
+      <h1 className="fs-1 fw-bold text-center my-4">A liquidity pool</h1>
 
       {currentAccount.length === 0 ? (
         <div className="user-not-connected d-flex flex-column justify-content-center my-4">

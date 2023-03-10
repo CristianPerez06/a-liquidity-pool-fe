@@ -12,7 +12,10 @@ const DepositsList: Component = (props) => {
 
   return (
     <div className="deposits-list mb-4" style={{ maxWidth: 700 + 'px' }}>
-      <div className="table-container bg-dark p-4 rounded-4">
+      <div
+        className="table-container bg-dark p-4"
+        style={{ borderBottomLeftRadius: 10 + 'px', borderBottomRightRadius: 10 + 'px' }}
+      >
         <Table responsive dark hover={deposits.length !== 0} className="text-center">
           <thead>
             <tr>

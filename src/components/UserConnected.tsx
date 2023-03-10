@@ -14,7 +14,7 @@ const UserConnected: Component = (props) => {
 
   return (
     <div className="user-connected">
-      <p className="wallet-address text-center">{truncateAddress(account)}</p>
+      <p className="fs-2 wallet-address text-center">{truncateAddress(account)}</p>
     </div>
   )
 }

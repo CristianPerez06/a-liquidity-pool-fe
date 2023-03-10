@@ -4,6 +4,7 @@ import { MOCK_ETH_ADDRESS, PROVIDERS_DATA } from '../utilities/constants'
 import { accountReservesDataWithBalanceToUI, getChainById, reservesDataWithBalanceToUI } from '../utilities/helpers'
 import { DepositData, ReservesData } from '../utilities/types'
 import Deposits from './Deposits/Deposits'
+import FilterInput from './FilterInput'
 import Reserves from './Reserves/Reserves'
 
 interface DashboardProps {
@@ -93,6 +94,10 @@ const Dashboard: Component = (props) => {
     setReservesUpToDate(false)
   }, [])
 
+  const handleOnChange = useCallback(() => {
+    setReservesUpToDate(false)
+  }, [])
+
   useEffect(() => {
     // If reserves are up to date then fetching data is not needed
     if (reservesUpToDate) {
@@ -119,6 +124,7 @@ const Dashboard: Component = (props) => {
         errorMessage={reservesError}
         onReserveUpdate={handleReservesUpdated}
       />
+      <FilterInput onChange={handleOnChange} />
       <Deposits depositsData={depositsData} isLoading={isDepositsLoading} errorMessage={depositsError} />
     </div>
   )
