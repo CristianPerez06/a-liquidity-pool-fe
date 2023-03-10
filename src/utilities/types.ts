@@ -46,3 +46,10 @@ export interface DepositData {
   tx: string
   amount: number
 }
+
+export interface ReservesData {
+  chainId: number
+  accountAddress: string
+  reservesWithBalances: ReserveDataWithBalance[]
+  accountReservesWithBalances: AccountReserveDataWithBalance[]
+}
