@@ -7,16 +7,16 @@ interface ReservesProps {
   isLoading?: boolean
   errorMessage?: string
   reservesData?: ReservesData
-  onReserveUpdate: () => void
+  onNewSupply: (newSupply: any) => void
 }
 
 type Component = (props: ReservesProps) => JSX.Element
 
 const Reserves: Component = (props) => {
-  const { reservesData, isLoading = false, errorMessage, onReserveUpdate } = props
+  const { reservesData, isLoading = false, errorMessage, onNewSupply } = props
 
-  const handleReservesUpdated = useCallback(() => {
-    onReserveUpdate()
+  const handleOnNewSupply = useCallback((newSupply: any) => {
+    onNewSupply(newSupply)
   }, [])
 
   return (
@@ -31,7 +31,7 @@ const Reserves: Component = (props) => {
                 account={reservesData.accountAddress}
                 chainId={reservesData.chainId}
                 reserves={reservesData.reservesWithBalances}
-                onSupply={handleReservesUpdated}
+                onSupply={handleOnNewSupply}
               />
             </div>
             <div className="col">

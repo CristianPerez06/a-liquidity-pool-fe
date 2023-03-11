@@ -18,7 +18,7 @@ const Dashboard: Component = (props) => {
   const { account, chainId } = props
 
   const [isReservesLoading, setIsReservesLoading] = useState(false)
-  const [reservesUpToDate, setReservesUpToDate] = useState(false)
+  const [newDeposit, setNewDeposit] = useState()
   const [reservesError, setReservesError] = useState('')
   const [reservesData, setReservesData] = useState<ReservesData>()
 
@@ -90,31 +90,44 @@ const Dashboard: Component = (props) => {
       })
   }
 
-  const handleReservesUpdated = useCallback(() => {
-    setReservesUpToDate(false)
+  const handleOnNewSupply = useCallback((newSupply: any) => {
+    const { tx, amount } = newSupply
+    const newDeposit: DepositData = {
+      tx: tx,
+      amount: amount,
+    }
+    // setReservesUpToDate(false)
+    const newDepositDataList = [...depositsData]
+    newDepositDataList.push(newDeposit)
+    setDepositsData(newDepositDataList)
   }, [])
 
   const handleOnChange = useCallback(() => {
-    setReservesUpToDate(false)
+    // setReservesUpToDate(false)
   }, [])
 
-  useEffect(() => {
-    // If reserves are up to date then fetching data is not needed
-    if (reservesUpToDate) {
-      return
-    }
+  // useEffect(() => {
+  //   // If reserves are up to date then fetching data is not needed
+  //   if (reservesUpToDate) {
+  //     return
+  //   }
 
+  //   fetchReserves()
+  //   fetchDeposits(chainId, account)
+
+  //   const fetch = async () => {
+  //     Promise.allSettled([fetchReserves(), fetchDeposits(chainId, account)])
+  //   }
+
+  //   fetch().then(() => {
+  //     setReservesUpToDate(true)
+  //   })
+  // }, [chainId, account, reservesUpToDate])
+
+  useEffect(() => {
     fetchReserves()
     fetchDeposits(chainId, account)
-
-    const fetch = async () => {
-      Promise.allSettled([fetchReserves(), fetchDeposits(chainId, account)])
-    }
-
-    fetch().then(() => {
-      setReservesUpToDate(true)
-    })
-  }, [chainId, account, reservesUpToDate])
+  }, [])
 
   return (
     <div className="dashboard mt-4">
@@ -122,7 +135,7 @@ const Dashboard: Component = (props) => {
         reservesData={reservesData}
         isLoading={isReservesLoading}
         errorMessage={reservesError}
-        onReserveUpdate={handleReservesUpdated}
+        onNewSupply={handleOnNewSupply}
       />
       <FilterInput onChange={handleOnChange} />
       <Deposits depositsData={depositsData} isLoading={isDepositsLoading} errorMessage={depositsError} />

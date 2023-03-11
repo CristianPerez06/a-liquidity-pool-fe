@@ -20,7 +20,7 @@ interface ReservesListProps {
   account: string
   chainId: number
   reserves: ReserveDataWithBalance[]
-  onSupply?: () => void
+  onSupply?: (newSupply: any) => void
 }
 
 type Component = (props: ReservesListProps) => JSX.Element
@@ -67,9 +67,9 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
-      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
-      // const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
+      // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
+      // const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         supplyData: { ...sData },
@@ -93,15 +93,20 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
-      await supplyAsset(chainData.chainId, reserveListState.supplyData?.asset, reserveListState.supplyData)
+      // await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
+      const newSupply = await supplyAsset(
+        chainData.chainId,
+        reserveListState.supplyData?.asset,
+        reserveListState.supplyData
+      )
 
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         isTxApproved: false,
         isModalOpen: false,
+        isLoading: false,
       }))
-      onSupply?.()
+      onSupply?.(newSupply)
     } catch (err: any) {
       setReserveListState((prev: ComponentState) => ({
         ...prev,

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { DepositData } from '../../utilities/types'
 import DepositsList from './DepositsList'
 
@@ -12,14 +13,22 @@ type Component = (props: DepositsProps) => JSX.Element
 const Deposits: Component = (props) => {
   const { depositsData, isLoading = false, errorMessage } = props
 
+  const [items, setItems] = useState<DepositData[]>()
+
+  useEffect(() => {
+    if (depositsData) {
+      setItems(depositsData)
+    }
+  }, depositsData)
+
   return (
     <div className="deposits">
       {isLoading && <p className="text-center">Loading...</p>}
       {errorMessage && <p className="text-center">{errorMessage}</p>}
-      {!isLoading && !errorMessage && depositsData && (
+      {!isLoading && !errorMessage && items && (
         <div className="container">
           <div className="row justify-content-center">
-            <DepositsList deposits={depositsData} />
+            <DepositsList deposits={items} />
           </div>
         </div>
       )}
