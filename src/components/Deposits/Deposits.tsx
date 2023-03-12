@@ -19,7 +19,7 @@ const Deposits: Component = (props) => {
     if (depositsData) {
       setItems(depositsData)
     }
-  }, depositsData)
+  }, [depositsData])
 
   return (
     <div className="deposits">
