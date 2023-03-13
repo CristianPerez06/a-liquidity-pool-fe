@@ -55,8 +55,6 @@ const App: Component = () => {
 
   // Check wallet
   const checkWallet = async () => {
-    // eslint-disable-next-line no-debugger
-    debugger
     setError(undefined)
 
     try {
@@ -103,14 +101,8 @@ const App: Component = () => {
     }
   }, [])
 
-  // Handle chainChanged event
+  // Handle events
   onChainChanged(setCurrentChainId)
-  // if (currentAccount) {
-  //   onDisconnect()
-  // }
-  // if (!currentAccount) {
-  //   onConnect()
-  // }
   onAccountsChanged(setCurrentAccount)
 
   // On first load set CurrentChainId

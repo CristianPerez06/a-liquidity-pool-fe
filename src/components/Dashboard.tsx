@@ -4,7 +4,6 @@ import { MOCK_ETH_ADDRESS, PROVIDERS_DATA } from '../utilities/constants'
 import { accountReservesDataWithBalanceToUI, getChainById, reservesDataWithBalanceToUI } from '../utilities/helpers'
 import { DepositData, ReservesData } from '../utilities/types'
 import Deposits from './Deposits/Deposits'
-import FilterInput from './FilterInput'
 import Reserves from './Reserves/Reserves'
 
 interface DashboardProps {
@@ -18,7 +17,6 @@ const Dashboard: Component = (props) => {
   const { account, chainId } = props
 
   const [isReservesLoading, setIsReservesLoading] = useState(false)
-  const [newDeposit, setNewDeposit] = useState()
   const [reservesError, setReservesError] = useState('')
   const [reservesData, setReservesData] = useState<ReservesData>()
 
@@ -90,39 +88,17 @@ const Dashboard: Component = (props) => {
       })
   }
 
-  const handleOnNewSupply = useCallback((newSupply: any) => {
-    const { tx, amount } = newSupply
-    const newDeposit: DepositData = {
-      tx: tx,
-      amount: amount,
-    }
-    // setReservesUpToDate(false)
-    const newDepositDataList = [...depositsData]
-    newDepositDataList.push(newDeposit)
-    setDepositsData(newDepositDataList)
-  }, [])
+  const handleOnNewSupply = (newSupply: any) => {
+    setDepositsData((prev) => {
+      const prevList = [...prev]
+      prevList.pop()
+      return [newSupply, ...prevList]
+    })
+  }
 
-  const handleOnChange = useCallback(() => {
+  const handleOnFilter = useCallback(() => {
     // setReservesUpToDate(false)
   }, [])
-
-  // useEffect(() => {
-  //   // If reserves are up to date then fetching data is not needed
-  //   if (reservesUpToDate) {
-  //     return
-  //   }
-
-  //   fetchReserves()
-  //   fetchDeposits(chainId, account)
-
-  //   const fetch = async () => {
-  //     Promise.allSettled([fetchReserves(), fetchDeposits(chainId, account)])
-  //   }
-
-  //   fetch().then(() => {
-  //     setReservesUpToDate(true)
-  //   })
-  // }, [chainId, account, reservesUpToDate])
 
   useEffect(() => {
     fetchReserves()
@@ -137,8 +113,12 @@ const Dashboard: Component = (props) => {
         errorMessage={reservesError}
         onNewSupply={handleOnNewSupply}
       />
-      <FilterInput onChange={handleOnChange} />
-      <Deposits depositsData={depositsData} isLoading={isDepositsLoading} errorMessage={depositsError} />
+      <Deposits
+        depositsData={depositsData}
+        isLoading={isDepositsLoading}
+        errorMessage={depositsError}
+        onFilter={handleOnFilter}
+      />
     </div>
   )
 }

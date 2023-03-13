@@ -31,9 +31,9 @@ const DepositsList: Component = (props) => {
           </thead>
           {deposits.length !== 0 ? (
             <tbody>
-              {deposits.map((deposit) => {
+              {deposits.map((deposit, index) => {
                 return (
-                  <tr key={deposit.tx}>
+                  <tr key={index}>
                     <td>Deposit</td>
                     <td>
                       <span className="d-inline-block text-break">0x8d6880f757c4e8BAFeD195D4370d98a424245136</span>
