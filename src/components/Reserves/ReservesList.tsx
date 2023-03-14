@@ -67,9 +67,8 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
-      // const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
-      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
+      const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
+      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         supplyData: { ...sData },
@@ -93,7 +92,7 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      // await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
+      await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
       const newSupply = await supplyAsset(
         chainData.chainId,
         reserveListState.supplyData?.asset,

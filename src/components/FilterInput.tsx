@@ -18,7 +18,7 @@ const FilterInput: Component = (props) => {
   return (
     <div className="filter-input container">
       <div className="row justify-content-center">
-        <div className="wrapper d-flex justify-content-center" style={{ maxWidth: 700 + 'px' }}>
+        <div className="wrapper d-flex justify-content-center">
           <div className="input-container w-100 d-flex justify-content-center bg-dark p-4 mb-2 rounded-4">
             <Input placeholder="Filter by tag" style={{ maxWidth: 300 + 'px' }} onChange={handleOnChange} />
           </div>

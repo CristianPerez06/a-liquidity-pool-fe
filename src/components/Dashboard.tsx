@@ -159,8 +159,8 @@ const Dashboard: Component = (props) => {
 
   return (
     <div className="dashboard mt-4">
-      <div className="row mx-0">
-        <div className="col">
+      <div className="row mx-0 d-flex justify-content-center">
+        <div className="col" style={{ maxWidth: 700 + 'px' }}>
           <Reserves
             reservesData={reservesInfo.data}
             isLoading={reservesInfo.isLoading}
@@ -168,7 +168,7 @@ const Dashboard: Component = (props) => {
             onNewSupply={handleOnNewSupply}
           />
         </div>
-        <div className="col">
+        <div className="col" style={{ maxWidth: 700 + 'px' }}>
           <div className="container">
             <div className="row justify-content-center">
               <FilterInput onChange={handleOnFilter} />

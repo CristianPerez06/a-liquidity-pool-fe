@@ -11,7 +11,7 @@ const DepositsList: Component = (props) => {
   const { deposits } = props
 
   return (
-    <div className="deposits-list mb-4" style={{ maxWidth: 700 + 'px' }}>
+    <div className="deposits-list mb-4">
       <div className="table-container bg-dark p-4 rounded-4">
         <Table responsive dark hover={deposits.length !== 0} className="text-center">
           <thead>
@@ -28,12 +28,12 @@ const DepositsList: Component = (props) => {
           </thead>
           {deposits.length !== 0 ? (
             <tbody>
-              {deposits.map((deposit, index) => {
+              {deposits.map((deposit) => {
                 return (
-                  <tr key={index}>
+                  <tr key={deposit.tx}>
                     <td>Deposit</td>
                     <td>
-                      <span className="d-inline-block text-break">0x8d6880f757c4e8BAFeD195D4370d98a424245136</span>
+                      <span className="d-inline-block text-break">{deposit.tx}</span>
                     </td>
                     <td>{deposit.amount}</td>
                   </tr>
