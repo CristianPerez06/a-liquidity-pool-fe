@@ -3,7 +3,7 @@ import { DepositData } from './types'
 
 export const fetchReservesSummary = async (chainId: number, account: string) => {
   try {
-    const url = new URL('http://localhost:4400/api/reserves-summary')
+    const url = new URL(`${process.env.REACT_APP_API_URL}/api/reserves-summary`)
     url.search = `chain=${chainId}&account=${account}`
 
     const response = await fetch(url)
@@ -18,13 +18,14 @@ export const fetchReservesSummary = async (chainId: number, account: string) => 
       accountReserves: accountReservesData,
     }
   } catch (error: any) {
+    console.log(error)
     throw new Error(error.message)
   }
 }
 
 export const fetchAccountBalances = async (chainId: number, account: string) => {
   try {
-    const url = new URL('http://localhost:4400/api/account-balances')
+    const url = new URL(`${process.env.REACT_APP_API_URL}/api/account-balances`)
     url.search = `chain=${chainId}&account=${account}`
 
     const response = await fetch(url)
@@ -40,7 +41,7 @@ export const supplyAsset = async (chainId: number, reserve: any, supplyData: any
   const payload = { chain: chainId, reserve: reserve, data: supplyData }
 
   try {
-    const url = new URL('http://localhost:4400/api/supply-asset')
+    const url = new URL(`${process.env.REACT_APP_API_URL}/api/supply-asset`)
     const params: any = {
       method: 'POST',
       headers: {
@@ -61,7 +62,7 @@ export const supplyAsset = async (chainId: number, reserve: any, supplyData: any
 
 export const fetchLatestDeposits = async (chainId: number, account: string) => {
   try {
-    const url = new URL('http://localhost:4400/api/latest-deposits')
+    const url = new URL(`${process.env.REACT_APP_API_URL}/api/latest-deposits`)
     url.search = `chain=${chainId}&account=${account}`
 
     const response = await fetch(url)
@@ -75,7 +76,7 @@ export const fetchLatestDeposits = async (chainId: number, account: string) => {
 
 export const fetchDepositsByFilter = async (chainId: number, account: string, tag: string) => {
   try {
-    const url = new URL('http://localhost:4400/api/deposits-by-matching-tag')
+    const url = new URL(`${process.env.REACT_APP_API_URL}/api/deposits-by-matching-tag`)
     url.search = `chain=${chainId}&account=${account}&tag=${tag}`
 
     const response = await fetch(url)
