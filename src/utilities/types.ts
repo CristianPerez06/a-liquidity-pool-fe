@@ -19,7 +19,7 @@ export interface ReserveDataWithBalance extends BasicReserveData {
   isIsolated: boolean
 }
 
-export interface UserReserveDataWithBalance extends BasicReserveData {
+export interface AccountReserveDataWithBalance extends BasicReserveData {
   balanceUSD: string
 }
 
@@ -30,8 +30,28 @@ export interface PermitData {
   deadline: number
 }
 
-export interface DepositData extends PermitData {
+// export interface SupplyData extends PermitData {
+//   asset: string
+//   amount: number
+//   onBehalfOf: string
+// }
+
+export interface SupplyData {
   asset: string
   amount: number
   onBehalfOf: string
+}
+
+export interface DepositData {
+  tx: string
+  amount: number
+  chainid: number
+  tag: string
+}
+
+export interface ReservesData {
+  chainId: number
+  accountAddress: string
+  reservesWithBalances: ReserveDataWithBalance[]
+  accountReservesWithBalances: AccountReserveDataWithBalance[]
 }

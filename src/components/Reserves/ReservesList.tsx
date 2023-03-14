@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { Button, Table } from 'reactstrap'
-import { depositAsset } from '../../utilities/api'
-import { PROVIDERS_DATA } from '../../utilities/constants'
-import { confirmTransaction, signPermit } from '../../utilities/ethereum'
+import { supplyAsset } from '../../utilities/api'
+// import { confirmTransaction, signPermit } from '../../utilities/ethereum'
 import { getChainById, getWalletError } from '../../utilities/helpers'
-import { BasicReserveData, DepositData, ReserveDataWithBalance } from '../../utilities/types'
-import DepositModal from './DepositModal'
+import { BasicReserveData, SupplyData, ReserveDataWithBalance } from '../../utilities/types'
+import SupplyModal from './SupplyModal'
 
 interface ComponentState {
   isModalOpen: boolean
@@ -13,20 +12,20 @@ interface ComponentState {
   isTxApproved: boolean
   modalError: string
   modalData?: BasicReserveData
-  depositData?: DepositData
+  supplyData?: SupplyData | undefined
 }
 
 interface ReservesListProps {
   account: string
   chainId: number
   reserves: ReserveDataWithBalance[]
-  onDeposit?: () => void
+  onSupply?: (newSupply: any) => void
 }
 
 type Component = (props: ReservesListProps) => JSX.Element
 
 const ReservesList: Component = (props) => {
-  const { account, chainId, reserves, onDeposit } = props
+  const { account, chainId, reserves, onSupply } = props
 
   const initialState = {
     isModalOpen: false,
@@ -34,12 +33,12 @@ const ReservesList: Component = (props) => {
     isTxApproved: false,
     modalError: '',
     modalData: undefined,
-    depositData: undefined,
+    supplyData: undefined,
   }
 
   const [reserveListState, setReserveListState] = useState<ComponentState>(initialState)
 
-  const chainData = getChainById(chainId) || PROVIDERS_DATA.GOERLI
+  const chainData = getChainById(chainId)
 
   const handleOnModalOpen = (asset: BasicReserveData) => {
     setReserveListState((prev: ComponentState) => ({
@@ -53,6 +52,7 @@ const ReservesList: Component = (props) => {
     setReserveListState((prev: ComponentState) => ({
       ...prev,
       modalError: '',
+      isTxApproved: false,
       isLoading: false,
       isModalOpen: false,
     }))
@@ -66,12 +66,13 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
-      const dData: DepositData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
+      // const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
 
       setReserveListState((prev: ComponentState) => ({
         ...prev,
-        depositData: { ...dData },
+        supplyData: { ...sData },
         isTxApproved: true,
         isLoading: false,
       }))
@@ -84,7 +85,7 @@ const ReservesList: Component = (props) => {
     }
   }
 
-  const handleOnDeposit = async () => {
+  const handleOnSupply = async () => {
     setReserveListState((prev: ComponentState) => ({
       ...prev,
       modalError: '',
@@ -92,15 +93,19 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      await confirmTransaction(reserveListState.depositData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
-      await depositAsset(chainData.chainId, reserveListState.depositData?.asset, reserveListState.depositData)
+      // await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
+      const res = await supplyAsset(chainData.chainId, reserveListState.supplyData?.asset, reserveListState.supplyData)
+      if (res.error) {
+        throw new Error(res.error)
+      }
 
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         isTxApproved: false,
         isModalOpen: false,
+        isLoading: false,
       }))
-      onDeposit?.()
+      onSupply?.(res)
     } catch (err: any) {
       setReserveListState((prev: ComponentState) => ({
         ...prev,
@@ -116,7 +121,12 @@ const ReservesList: Component = (props) => {
       <div className="table-container bg-dark p-4 rounded-4">
         <Table responsive dark hover className="text-center">
           <thead>
-            <tr className="fs-4">
+            <tr>
+              <th colSpan={4} className="fs-2 pb-4">
+                Assets
+              </th>
+            </tr>
+            <tr className="fs-5">
               <th>Asset</th>
               <th>Wallet Balance</th>
               <th>APY</th>
@@ -142,7 +152,7 @@ const ReservesList: Component = (props) => {
                       }}
                       disabled={!(Number(reserve.balance) > 0)}
                     >
-                      Deposit
+                      Supply
                     </Button>
                   </td>
                 </tr>
@@ -153,10 +163,10 @@ const ReservesList: Component = (props) => {
       </div>
       {/* Modal */}
       {reserveListState.isModalOpen && reserveListState.modalData && (
-        <DepositModal
+        <SupplyModal
           assetData={reserveListState.modalData}
           onApproval={handleOnApproval}
-          onDeposit={handleOnDeposit}
+          onSupply={handleOnSupply}
           onClose={handleOnModalClose}
           isTxApproved={reserveListState.isTxApproved}
           isLoading={reserveListState.isLoading}
