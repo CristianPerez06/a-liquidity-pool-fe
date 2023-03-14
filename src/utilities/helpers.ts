@@ -20,7 +20,7 @@ export const getProviderDataByChainId = (id: number) => {
 }
 
 export const getChainById = (id: number) => {
-  const chain = chainsToList().find((x) => x.chainId === id)
+  const chain = chainsToList().find((x) => x.chainId === id) || PROVIDERS_DATA.GOERLI
   return chain
 }
 

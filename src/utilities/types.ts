@@ -45,6 +45,7 @@ export interface SupplyData {
 export interface DepositData {
   tx: string
   amount: number
+  chainid: number
 }
 
 export interface ReservesData {

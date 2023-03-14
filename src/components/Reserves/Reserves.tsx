@@ -2,7 +2,8 @@ import { useCallback } from 'react'
 import { ReservesData } from '../../utilities/types'
 import ReservesList from '../Reserves/ReservesList'
 import AccountReservesList from '../Reserves/AccountReservesList'
-import CustomSpinner from '../CustomSpinner'
+import CustomSpinner from '../shared/CustomSpinner'
+import CustomAlert from '../shared/CustomAlert'
 
 interface ReservesProps {
   isLoading?: boolean
@@ -23,7 +24,8 @@ const Reserves: Component = (props) => {
   return (
     <div className="reserves">
       {isLoading && <CustomSpinner />}
-      {errorMessage && <p className="text-center">{errorMessage}</p>}
+      {errorMessage && <CustomAlert text={errorMessage} />}
+
       {!isLoading && !errorMessage && reservesData && (
         <div className="container">
           <div className="row">

@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Button, Table } from 'reactstrap'
 import { supplyAsset } from '../../utilities/api'
-import { PROVIDERS_DATA } from '../../utilities/constants'
-import { confirmTransaction, signPermit } from '../../utilities/ethereum'
+// import { confirmTransaction, signPermit } from '../../utilities/ethereum'
 import { getChainById, getWalletError } from '../../utilities/helpers'
 import { BasicReserveData, SupplyData, ReserveDataWithBalance } from '../../utilities/types'
 import SupplyModal from './SupplyModal'
@@ -39,7 +38,7 @@ const ReservesList: Component = (props) => {
 
   const [reserveListState, setReserveListState] = useState<ComponentState>(initialState)
 
-  const chainData = getChainById(chainId) || PROVIDERS_DATA.GOERLI
+  const chainData = getChainById(chainId)
 
   const handleOnModalOpen = (asset: BasicReserveData) => {
     setReserveListState((prev: ComponentState) => ({
@@ -67,8 +66,10 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
-      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      // const pData = await signPermit(chainData.chainId, account, chainData.lendingPoolProviderAddress)
+      // const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account, ...pData }
+      const sData: SupplyData = { asset: reserveData.address, amount: amount, onBehalfOf: account }
+
       setReserveListState((prev: ComponentState) => ({
         ...prev,
         supplyData: { ...sData },
@@ -92,12 +93,11 @@ const ReservesList: Component = (props) => {
     }))
 
     try {
-      await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
-      const newSupply = await supplyAsset(
-        chainData.chainId,
-        reserveListState.supplyData?.asset,
-        reserveListState.supplyData
-      )
+      // await confirmTransaction(reserveListState.supplyData?.onBehalfOf, PROVIDERS_DATA.GOERLI.poolProxyAddress)
+      const res = await supplyAsset(chainData.chainId, reserveListState.supplyData?.asset, reserveListState.supplyData)
+      if (res.error) {
+        throw new Error(res.error)
+      }
 
       setReserveListState((prev: ComponentState) => ({
         ...prev,
@@ -105,7 +105,7 @@ const ReservesList: Component = (props) => {
         isModalOpen: false,
         isLoading: false,
       }))
-      onSupply?.(newSupply)
+      onSupply?.(res)
     } catch (err: any) {
       setReserveListState((prev: ComponentState) => ({
         ...prev,

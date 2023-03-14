@@ -50,7 +50,8 @@ const Dashboard: Component = (props) => {
   const [depositsDataFiltered, setDepositsDataFiltered] = useState<DepositData[]>()
 
   const getReservesAndBalances = async () => {
-    const defaultChain = getChainById(chainId) || PROVIDERS_DATA.GOERLI
+    const defaultChain = getChainById(chainId)
+
     const reservesSummary = await fetchReservesSummary(chainId, account)
     const balances = await fetchAccountBalances(chainId, account)
 
@@ -100,7 +101,10 @@ const Dashboard: Component = (props) => {
     })
 
     fetchLatestDeposits(chainId, account)
-      .then((res) => {
+      .then((res: any) => {
+        if (res.error) {
+          throw new Error(res.error)
+        }
         setDepositsInfo((prev) => {
           return { ...prev, error: '', isLoading: false, data: res }
         })
@@ -122,8 +126,10 @@ const Dashboard: Component = (props) => {
     })
 
     fetchDepositsByFilter(chainId, account, tag)
-      .then((res) => {
-        console.log(res)
+      .then((res: any) => {
+        if (res.error) {
+          throw new Error(res.error)
+        }
         setDepositsInfo((prev) => {
           return { ...prev, error: '', isLoading: false }
         })

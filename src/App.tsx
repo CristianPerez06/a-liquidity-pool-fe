@@ -1,57 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import Dashboard from './components/Dashboard'
+import CustomAlert from './components/shared/CustomAlert'
 import UserConnected from './components/UserConnected'
 import UserNotConnected from './components/UserNotConnected'
 import { PROVIDERS_DATA } from './utilities/constants'
-import {
-  connect,
-  ethDetected,
-  getAccounts,
-  getChainId,
-  onAccountsChanged,
-  onChainChanged,
-  // onConnect,
-  // onDisconnect,
-} from './utilities/ethereum'
+import { CustomError, ERRORS, ErrorTypes } from './utilities/errors'
+import { connect, ethDetected, getAccounts, getChainId, onAccountsChanged, onChainChanged } from './utilities/ethereum'
 import { getChainIdHumanized, getWalletError } from './utilities/helpers'
-
-enum ErrorTypes {
-  NO_WALLET = 'NO_WALLET',
-  NOT_LOGGED_IN = 'NOT_LOGGED_IN',
-  UNSUPPORTED_CHAIN = 'UNSUPPORTED_CHAIN',
-  DEFAULT = 'DEFAULT',
-}
-
-interface Error {
-  type: ErrorTypes
-  message: string
-}
-
-const ERRORS = {
-  [ErrorTypes.NO_WALLET]: {
-    type: ErrorTypes.NO_WALLET,
-    message: 'You need to install Metamask.',
-  },
-  [ErrorTypes.NOT_LOGGED_IN]: {
-    type: ErrorTypes.NOT_LOGGED_IN,
-    message: 'No authorized account found.',
-  },
-  [ErrorTypes.UNSUPPORTED_CHAIN]: {
-    type: ErrorTypes.UNSUPPORTED_CHAIN,
-    message: 'Chain is not supported. Use G\xF6erli.',
-  },
-  [ErrorTypes.DEFAULT]: {
-    type: ErrorTypes.DEFAULT,
-    message: 'Oops... something went wrong.',
-  },
-}
 
 type Component = () => JSX.Element
 
 const App: Component = () => {
   const [currentChainId, setCurrentChainId] = useState(PROVIDERS_DATA.GOERLI.chainId)
   const [currentAccount, setCurrentAccount] = useState('')
-  const [error, setError] = useState<Error | undefined>()
+  const [error, setError] = useState<CustomError | undefined>()
 
   // Check wallet
   const checkWallet = async () => {
@@ -131,7 +93,6 @@ const App: Component = () => {
   return (
     <div className="App">
       <h1 className="fs-1 fw-bold text-center my-4">A liquidity pool</h1>
-
       {currentAccount.length === 0 ? (
         <div className="user-not-connected d-flex flex-column justify-content-center my-4">
           <UserNotConnected isDisabled={walletError || chainError} onConnect={() => connectWallet()} />
@@ -143,7 +104,7 @@ const App: Component = () => {
         </div>
       )}
 
-      {error && <p className="text-center">{error.message}</p>}
+      {error && <CustomAlert text={error.message} />}
     </div>
   )
 }
