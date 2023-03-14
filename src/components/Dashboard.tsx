@@ -1,10 +1,29 @@
-import { useCallback, useEffect, useState } from 'react'
-import { fetchAccountBalances, fetchLatestDeposits, fetchReservesSummary } from '../utilities/api'
+import { debounce } from 'lodash'
+import { useEffect, useState } from 'react'
+import {
+  fetchAccountBalances,
+  fetchLatestDeposits,
+  fetchReservesSummary,
+  fetchDepositsByFilter,
+} from '../utilities/api'
 import { MOCK_ETH_ADDRESS, PROVIDERS_DATA } from '../utilities/constants'
 import { accountReservesDataWithBalanceToUI, getChainById, reservesDataWithBalanceToUI } from '../utilities/helpers'
 import { DepositData, ReservesData } from '../utilities/types'
 import Deposits from './Deposits/Deposits'
+import FilterInput from './FilterInput'
 import Reserves from './Reserves/Reserves'
+
+interface ReservesInfo {
+  isLoading: boolean
+  error: string
+  data: ReservesData | undefined
+}
+
+interface DepositsInfo {
+  isLoading: boolean
+  error: string
+  data: DepositData[] | undefined
+}
 
 interface DashboardProps {
   chainId: number
@@ -16,15 +35,21 @@ type Component = (props: DashboardProps) => JSX.Element
 const Dashboard: Component = (props) => {
   const { account, chainId } = props
 
-  const [isReservesLoading, setIsReservesLoading] = useState(false)
-  const [reservesError, setReservesError] = useState('')
-  const [reservesData, setReservesData] = useState<ReservesData>()
+  const [reservesInfo, setReservesInfo] = useState<ReservesInfo>({
+    isLoading: false,
+    error: '',
+    data: undefined,
+  })
 
-  const [isDepositsLoading, setIsDepositsLoading] = useState(false)
-  const [depositsError, setDepositsError] = useState('')
-  const [depositsData, setDepositsData] = useState<DepositData[]>([])
+  const [depositsInfo, setDepositsInfo] = useState<DepositsInfo>({
+    isLoading: false,
+    error: '',
+    data: [],
+  })
 
-  const fetchReservesData = async () => {
+  const [depositsDataFiltered, setDepositsDataFiltered] = useState<DepositData[]>()
+
+  const getReservesAndBalances = async () => {
     const defaultChain = getChainById(chainId) || PROVIDERS_DATA.GOERLI
     const reservesSummary = await fetchReservesSummary(chainId, account)
     const balances = await fetchAccountBalances(chainId, account)
@@ -51,74 +76,111 @@ const Dashboard: Component = (props) => {
     }
   }
 
-  const fetchReserves = async () => {
-    setReservesError('')
-    setIsReservesLoading(true)
+  const getReserves = async () => {
+    setReservesInfo((prev) => {
+      return { ...prev, error: '', isLoading: true }
+    })
 
-    fetchReservesData()
+    getReservesAndBalances()
       .then((res) => {
-        setReservesData(res)
+        setReservesInfo((prev) => {
+          return { ...prev, error: '', isLoading: false, data: res }
+        })
       })
       .catch(() => {
-        setReservesError('There was an error trying to fetch the Pools data')
-      })
-      .finally(() => {
-        setIsReservesLoading(false)
+        setReservesInfo((prev) => {
+          return { ...prev, error: 'There was an error trying to fetch the Pools data.', isLoading: false }
+        })
       })
   }
 
-  const fetchDepositsData = async (chainId: number, account: string) => {
-    const res = await fetchLatestDeposits(chainId, account)
-    return res
-  }
+  const getDeposits = async (chainId: number, account: string) => {
+    setDepositsInfo((prev) => {
+      return { ...prev, error: '', isLoading: true }
+    })
 
-  const fetchDeposits = async (chainId: number, account: string) => {
-    setDepositsError('')
-    setIsDepositsLoading(true)
-
-    fetchDepositsData(chainId, account)
+    fetchLatestDeposits(chainId, account)
       .then((res) => {
-        setDepositsData(res)
+        setDepositsInfo((prev) => {
+          return { ...prev, error: '', isLoading: false, data: res }
+        })
       })
       .catch(() => {
-        setDepositsError('There was an error trying to fetch the Pools data')
+        setDepositsInfo((prev) => {
+          return {
+            ...prev,
+            error: 'There was an error trying to fetch the Pools data.',
+            isLoading: false,
+          }
+        })
       })
-      .finally(() => {
-        setIsDepositsLoading(false)
+  }
+
+  const getDepositsFiltered = async (chainId: number, account: string, tag: string) => {
+    setDepositsInfo((prev) => {
+      return { ...prev, error: '', isLoading: true }
+    })
+
+    fetchDepositsByFilter(chainId, account, tag)
+      .then((res) => {
+        console.log(res)
+        setDepositsInfo((prev) => {
+          return { ...prev, error: '', isLoading: false }
+        })
+        setDepositsDataFiltered(res)
+      })
+      .catch(() => {
+        setDepositsInfo((prev) => {
+          return { ...prev, error: 'There was an error trying to fetch the Deposits data.', isLoading: false }
+        })
       })
   }
 
   const handleOnNewSupply = (newSupply: any) => {
-    setDepositsData((prev) => {
-      const prevList = [...prev]
+    setDepositsInfo((prev) => {
+      const prevList = [...(prev.data || [])]
       prevList.pop()
-      return [newSupply, ...prevList]
+      return { ...prev, error: '', isLoading: false, data: [newSupply, ...prevList] }
     })
   }
 
-  const handleOnFilter = useCallback(() => {
-    // setReservesUpToDate(false)
-  }, [])
+  const handleOnFilter = debounce((value: string) => {
+    if (value) {
+      getDepositsFiltered(chainId, account, value)
+    } else {
+      setDepositsDataFiltered(depositsInfo.data)
+    }
+  }, 200)
 
   useEffect(() => {
-    fetchReserves()
-    fetchDeposits(chainId, account)
+    getReserves()
+    getDeposits(chainId, account)
   }, [])
 
   return (
     <div className="dashboard mt-4">
-      <Reserves
-        reservesData={reservesData}
-        isLoading={isReservesLoading}
-        errorMessage={reservesError}
-        onNewSupply={handleOnNewSupply}
-      />
-      <Deposits
-        depositsData={depositsData}
-        isLoading={isDepositsLoading}
-        errorMessage={depositsError}
-        onFilter={handleOnFilter}
-      />
+      <div className="row mx-0">
+        <div className="col">
+          <Reserves
+            reservesData={reservesInfo.data}
+            isLoading={reservesInfo.isLoading}
+            errorMessage={reservesInfo.error}
+            onNewSupply={handleOnNewSupply}
+          />
+        </div>
+        <div className="col">
+          <div className="container">
+            <div className="row justify-content-center">
+              <FilterInput onChange={handleOnFilter} />
+            </div>
+          </div>
+          <Deposits
+            depositsData={depositsDataFiltered || depositsInfo.data}
+            isLoading={depositsInfo.isLoading}
+            errorMessage={depositsInfo.error}
+          />
+        </div>
+      </div>
     </div>
   )
 }

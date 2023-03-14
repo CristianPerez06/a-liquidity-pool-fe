@@ -72,3 +72,17 @@ export const fetchLatestDeposits = async (chainId: number, account: string) => {
     throw new Error(error.message)
   }
 }
+
+export const fetchDepositsByFilter = async (chainId: number, account: string, tag: string) => {
+  try {
+    const url = new URL('http://localhost:4400/api/deposits-by-matching-tag')
+    url.search = `chain=${chainId}&account=${account}&tag=${tag}`
+
+    const response = await fetch(url)
+    const data: DepositData[] = await response.json()
+
+    return data
+  } catch (error: any) {
+    throw new Error(error.message)
+  }
+}

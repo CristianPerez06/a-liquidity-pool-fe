@@ -27,17 +27,13 @@ const Reserves: Component = (props) => {
       {!isLoading && !errorMessage && reservesData && (
         <div className="container">
           <div className="row">
-            <div className="col">
-              <ReservesList
-                account={reservesData.accountAddress}
-                chainId={reservesData.chainId}
-                reserves={reservesData.reservesWithBalances}
-                onSupply={handleOnNewSupply}
-              />
-            </div>
-            <div className="col">
-              <AccountReservesList accountReserves={reservesData.accountReservesWithBalances} />
-            </div>
+            <ReservesList
+              account={reservesData.accountAddress}
+              chainId={reservesData.chainId}
+              reserves={reservesData.reservesWithBalances}
+              onSupply={handleOnNewSupply}
+            />
+            <AccountReservesList accountReserves={reservesData.accountReservesWithBalances} />
           </div>
         </div>
       )}
