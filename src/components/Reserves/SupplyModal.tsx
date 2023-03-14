@@ -2,29 +2,29 @@ import React, { useCallback, useState } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Spinner, Form, FormGroup, Label, Input } from 'reactstrap'
 import { BasicReserveData } from '../../utilities/types'
 
-interface DepositModalProps {
+interface SupplyModalProps {
   assetData: BasicReserveData
   isTxApproved?: boolean
   isLoading?: boolean
   onApproval?: (reserveData: BasicReserveData, amount: number) => void
-  onDeposit?: () => void
+  onSupply?: () => void
   onClose?: () => void
   error?: string
 }
 
-type Component = (props: DepositModalProps) => JSX.Element
+type Component = (props: SupplyModalProps) => JSX.Element
 
-const DepositModal: Component = (props) => {
-  const { assetData, onApproval, onDeposit, onClose, isTxApproved = false, isLoading = false, error } = props
+const SupplyModal: Component = (props) => {
+  const { assetData, onApproval, onSupply, onClose, isTxApproved = false, isLoading = false, error } = props
 
   const [amount, setAmount] = useState(0)
 
   const handleOnApproval = useCallback(() => {
     onApproval?.(assetData, amount)
-  }, [isTxApproved])
+  }, [isTxApproved, amount])
 
-  const handleOnDeposit = useCallback(() => {
-    onDeposit?.()
+  const handleOnSupply = useCallback(() => {
+    onSupply?.()
   }, [isTxApproved])
 
   const handleOnToggle = useCallback(() => {
@@ -39,7 +39,7 @@ const DepositModal: Component = (props) => {
     <div>
       <Modal isOpen toggle={() => !isLoading && handleOnToggle()}>
         <Form>
-          <ModalHeader toggle={() => !isLoading && handleOnToggle()}>{`Deposit ${assetData.symbol}`}</ModalHeader>
+          <ModalHeader toggle={() => !isLoading && handleOnToggle()}>{`Supply ${assetData.symbol}`}</ModalHeader>
           <ModalBody>
             <FormGroup>
               <Label for="amount">Amount</Label>
@@ -61,8 +61,8 @@ const DepositModal: Component = (props) => {
               >
                 Approve
               </Button>
-              <Button className="ms-2" color="primary" onClick={handleOnDeposit} disabled={!isTxApproved || isLoading}>
-                Deposit
+              <Button className="ms-2" color="primary" onClick={handleOnSupply} disabled={!isTxApproved || isLoading}>
+                Supply
               </Button>
               <Button className="ms-2" color="secondary" onClick={handleOnToggle} disabled={isLoading}>
                 Cancel
@@ -76,4 +76,4 @@ const DepositModal: Component = (props) => {
   )
 }
 
-export default DepositModal
+export default SupplyModal

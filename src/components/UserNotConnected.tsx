@@ -1,3 +1,5 @@
+import { Button } from 'reactstrap'
+
 interface UserNotConnectedProps {
   isDisabled: boolean
   onConnect: () => void
@@ -10,9 +12,9 @@ const UserNotConnected: Component = (props) => {
 
   return (
     <div className="user-not-connected text-center">
-      <button onClick={onConnect} disabled={isDisabled}>
+      <Button onClick={onConnect} disabled={isDisabled}>
         Connect Wallet
-      </button>
+      </Button>
     </div>
   )
 }

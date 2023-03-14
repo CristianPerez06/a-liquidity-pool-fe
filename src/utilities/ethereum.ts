@@ -13,6 +13,11 @@ export const getAccounts = async () => {
   return accounts
 }
 
+export const connect = async () => {
+  const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+  return accounts
+}
+
 export const getChainId = async () => {
   const chainId = await ethereum.request({ method: 'eth_chainId' })
   return chainId
@@ -23,6 +28,14 @@ export const onChainChanged = (callback: any) => {
     console.log('chainChanged')
     const chainIdHumanized = getChainIdHumanized(chainId)
     callback(chainIdHumanized)
+  })
+}
+
+export const onAccountsChanged = (callback: any) => {
+  return ethereum?.on('accountsChanged', (accounts: string[]) => {
+    console.log('onAccountsChanged')
+    const account = accounts[0] || ''
+    callback(account)
   })
 }
 
